@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTA Score Card - JEE (Main)</title>
+    <style>
+        /* --- General Reset --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+        body { background-color: #f4f6f9; color: #333; font-size: 14px; min-height: 100vh; }
+
+        /* --- Header Styles --- */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 40px; background: #fff; border-bottom: 1px solid #ddd; height: 100px; }
+        
+        .logo-container { width: 200px; display: flex; align-items: center; height: 100%; overflow: hidden; }
+        .logo-container img { height: 100%; width: 100%; object-fit: contain; }
+        .logo-left { justify-content: flex-start; }
+        .logo-right { justify-content: flex-end; }
+
+        .header-text { text-align: center; flex-grow: 1; }
+        .header-text h1 { font-size: 18px; font-weight: 800; color: #000; margin-bottom: 5px; text-transform: uppercase; }
+        .header-text h2 { font-size: 15px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+        .header-text h3 { font-size: 14px; font-weight: normal; color: #000; }
+
+        /* --- Login Section --- */
+        .blue-strip { height: 40px; background-color: #002244; width: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .login-container { display: flex; justify-content: center; margin-top: 40px; padding: 0 20px; }
+        .login-card { width: 100%; max-width: 700px; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .card-header { background-color: #002244; color: white; padding: 15px 20px; font-size: 18px; display: flex; align-items: center; }
+        .card-body { padding: 40px; }
+        
+        .form-group { display: flex; align-items: center; margin-bottom: 20px; }
+        .form-label { width: 40%; text-align: right; padding-right: 20px; font-weight: 600; font-size: 14px; color: #444; }
+        .form-input { width: 60%; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; outline: none; }
+        input:focus { border-color: #002244; }
+        
+        .captcha-container { display: flex; align-items: center; gap: 15px; }
+        .captcha-box { background-color: #000080; color: white; font-family: 'Courier New', monospace; font-size: 22px; padding: 8px 20px; letter-spacing: 3px; border-radius: 4px; user-select: none; }
+        
+        .btn-container { text-align: center; margin-top: 30px; }
+        .btn-login { background-color: #198754; color: white; border: none; padding: 12px 40px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; text-transform: uppercase; transition: background 0.2s; }
+        .btn-login:hover { background-color: #146c38; }
+
+        /* --- Realistic Top Loading Bar --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            display: none; /* Hidden by default */
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 4px;
+            background-color: #f3f3f3;
+            position: absolute;
+            top: 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #0d6efd; /* Official BootStrap Blue */
+            width: 0%;
+            transition: width 0.1s ease;
+            box-shadow: 0 2px 4px rgba(13, 110, 253, 0.4);
+        }
+
+        /* --- Scorecard Image Section --- */
+        #scorecard-section { display: none; background: #525659; min-height: 100vh; padding-bottom: 40px; }
+        
+        /* The container that fixes the zoom issue */
+        .pdf-view-container {
+            max-width: 850px; /* Constraints width to look like A4 paper */
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin-top: 30px;
+        }
+
+        .result-image {
+            width: 100%;
+            display: block; /* Removes bottom whitespace */
+            height: auto;
+        }
+
+        .print-btn-container { 
+            text-align: center; 
+            padding: 15px; 
+            background: #333; 
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .btn-print { background-color: #0d6efd; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; }
+        
+        @media print {
+            body { background: #fff; margin: 0; }
+            #login-section, .print-btn-container, header, .blue-strip, #loading-overlay { display: none !important; }
+            #scorecard-section { display: block !important; padding: 0; margin: 0; background: #fff; }
+            .pdf-view-container { max-width: 100%; box-shadow: none; margin: 0; }
+            .result-image { width: 100%; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-content">
+        <header id="main-header">
+            <div class="logo-container logo-left">
+                <img src="https://i.ibb.co/7xmxnGLh/IMG-20260111-235413.jpg" alt="Ministry of Education">
+            </div>
+            
+            <div class="header-text">
+                <h1>JOINT ENTRANCE EXAMINATION (Main) – 2025</h1>
+                <h2>SESSION 1 (JANUARY 2025)</h2>
+                <h3>NTA SCORE CARD: Paper 1 (B.E./B Tech.)</h3>
+            </div>
+            
+            <div class="logo-container logo-right">
+                <img src="https://i.ibb.co/Zp0nrJmr/IMG-20260111-235401.jpg" alt="NTA Logo">
+            </div>
+        </header>
+
+        <div id="blue-strip" class="blue-strip"></div>
+
+        <main id="login-section" class="login-container">
+            <div class="login-card">
+                <div class="card-header">
+                    <span>&#128274;</span>&nbsp; View Result
+                </div>
+                <div class="card-body">
+                    <form onsubmit="event.preventDefault(); validateAndLogin();">
+                        <div class="form-group">
+                            <label class="form-label">Application Number :</label>
+                            <div class="form-input">
+                                <input type="text" id="appInput" value="260310940763">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password :</label>
+                            <div class="form-input">
+                                <input type="password" id="passInput" value="shreyas@15">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Enter CAPTCHA <span style="color:#198754">(case sensitive)</span> :</label>
+                            <div class="form-input">
+                                <input type="text" placeholder="Enter code">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Security Pin :</label>
+                            <div class="captcha-container">
+                                <div class="captcha-box">L4QEV4</div>
+                            </div>
+                        </div>
+                        <div class="btn-container">
+                            <button type="submit" class="btn-login">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="loading-overlay">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="scorecard-section">
+        <div class="print-btn-container">
+            <button onclick="window.print()" class="btn-print"><span>&#128424;</span> PRINT / DOWNLOAD PDF</button>
+        </div>
+        
+        <div class="pdf-view-container">
+            <img src="https://i.ibb.co/wr4jctB9/Picsart-26-01-12-21-03-28-636.jpg" alt="Score Card" class="result-image">
+        </div>
+    </div>
+
+    <script>
+        function validateAndLogin() {
+            var appNo = document.getElementById('appInput').value;
+            var pass = document.getElementById('passInput').value;
+
+            if(appNo === "260310940763" && pass === "shreyas@15") {
+                startLoadingProcess();
+            } else {
+                alert("Invalid Application Number or Password. Please try again.");
+            }
+        }
+
+        function startLoadingProcess() {
+            // Hide the main login content immediately
+            document.getElementById('main-content').style.display = 'none';
+            
+            // Show the white overlay with the top bar
+            document.getElementById('loading-overlay').style.display = 'block';
+            
+            var progressBar = document.getElementById('progress-bar');
+            var width = 0;
+            
+            // Simulation of web page loading (starts fast, slows down, then finishes)
+            var interval = setInterval(function() {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    // Loading finished: Show result
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    document.getElementById('scorecard-section').style.display = 'block';
+                } else {
+                    // Random speed increments to look realistic
+                    width += Math.random() * 10; 
+                    if(width > 100) width = 100;
+                    progressBar.style.width = width + '%';
+                }
+            }, 200); // Updates every 200ms
+        }
+    </script>
+</body>
+</html>
